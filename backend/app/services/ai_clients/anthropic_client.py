@@ -1,23 +1,51 @@
 """Anthropic 客户端"""
 from typing import Any, AsyncGenerator, Dict, Optional
-
-from anthropic import AsyncAnthropic
+import json
 
 from app.logger import get_logger
-from app.services.ai_config import AIClientConfig, default_config
+from .base_client import BaseAIClient
 
 logger = get_logger(__name__)
 
 
-class AnthropicClient:
+class AnthropicClient(BaseAIClient):
     """Anthropic API 客户端"""
 
-    def __init__(self, api_key: str, base_url: Optional[str] = None, config: Optional[AIClientConfig] = None):
-        self.config = config or default_config
-        kwargs = {"api_key": api_key}
-        if base_url:
-            kwargs["base_url"] = base_url
-        self.client = AsyncAnthropic(**kwargs)
+    def _build_headers(self) -> Dict[str, str]:
+        return {
+            "x-api-key": self.api_key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"
+        }
+
+    def _build_payload(
+        self,
+        messages: list,
+        model: str,
+        temperature: float,
+        max_tokens: int,
+        system_prompt: Optional[str] = None,
+        tools: Optional[list] = None,
+        tool_choice: Optional[str] = None,
+        stream: bool = False,
+    ) -> Dict[str, Any]:
+        payload = {
+            "model": model,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "messages": messages,
+        }
+        if stream:
+            payload["stream"] = True
+        if system_prompt:
+            payload["system"] = system_prompt
+        if tools:
+            payload["tools"] = tools
+            if tool_choice == "required":
+                payload["tool_choice"] = {"type": "any"}
+            elif tool_choice == "auto":
+                payload["tool_choice"] = {"type": "auto"}
+        return payload
 
     async def chat_completion(
         self,
@@ -29,39 +57,26 @@ class AnthropicClient:
         tools: Optional[list] = None,
         tool_choice: Optional[str] = None,
     ) -> Dict[str, Any]:
-        kwargs = {
-            "model": model,
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-            "messages": messages,
-        }
-        if system_prompt:
-            kwargs["system"] = system_prompt
-        if tools:
-            kwargs["tools"] = tools
-            if tool_choice == "required":
-                kwargs["tool_choice"] = {"type": "any"}
-            elif tool_choice == "auto":
-                kwargs["tool_choice"] = {"type": "auto"}
+        payload = self._build_payload(messages, model, temperature, max_tokens, system_prompt, tools, tool_choice)
 
-        response = await self.client.messages.create(**kwargs)
+        data = await self._request_with_retry("POST", "/v1/messages", payload)
 
         tool_calls = []
         content = ""
-        for block in response.content:
-            if block.type == "tool_use":
+        for block in data.get("content", []):
+            if block.get("type") == "tool_use":
                 tool_calls.append({
-                    "id": block.id,
+                    "id": block.get("id"),
                     "type": "function",
-                    "function": {"name": block.name, "arguments": block.input},
+                    "function": {"name": block.get("name"), "arguments": block.get("input")},
                 })
-            elif block.type == "text":
-                content += block.text
+            elif block.get("type") == "text":
+                content += block.get("text", "")
 
         return {
             "content": content,
             "tool_calls": tool_calls if tool_calls else None,
-            "finish_reason": response.stop_reason,
+            "finish_reason": data.get("stop_reason"),
         }
 
     async def chat_completion_stream(
@@ -74,68 +89,48 @@ class AnthropicClient:
         tools: Optional[list] = None,
         tool_choice: Optional[str] = None,
     ) -> AsyncGenerator[Dict[str, Any], None]:
-        """
-        流式生成，支持工具调用
-        
-        Yields:
-            Dict with keys:
-            - content: str - 文本内容块
-            - tool_calls: list - 工具调用列表（如果有）
-            - done: bool - 是否结束
-        """
-        kwargs = {
-            "model": model,
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-            "messages": messages,
-        }
-        if system_prompt:
-            kwargs["system"] = system_prompt
-        if tools:
-            kwargs["tools"] = tools
-            if tool_choice == "required":
-                kwargs["tool_choice"] = {"type": "any"}
-            elif tool_choice == "auto":
-                kwargs["tool_choice"] = {"type": "auto"}
+        """流式生成"""
+        payload = self._build_payload(messages, model, temperature, max_tokens, system_prompt, tools, tool_choice, stream=True)
+
+        tool_calls = []
 
         try:
-            async with self.client.messages.stream(**kwargs) as stream:
+            async with await self._request_with_retry("POST", "/v1/messages", payload, stream=True) as response:
+                response.raise_for_status()
                 try:
-                    tool_calls = []
-                    async for chunk in stream:
-                        # 处理不同类型的块
-                        if chunk.type == "text_delta":
-                            yield {"content": chunk.text}
-                        elif chunk.type == "tool_use_delta":
-                            # 工具调用增量
-                            if not tool_calls or tool_calls[-1].get("id") != chunk.id:
-                                tool_calls.append({
-                                    "id": chunk.id,
-                                    "type": "function",
-                                    "function": {
-                                        "name": chunk.name,
-                                        "arguments": ""
-                                    }
-                                })
-                            # 追加参数
-                            if tool_calls[-1]["function"]["arguments"] is None:
-                                tool_calls[-1]["function"]["arguments"] = ""
-                            tool_calls[-1]["function"]["arguments"] += chunk.input_gets_new_text or ""
-                        elif chunk.type == "message_delta":
-                            if chunk.stop_reason:
-                                # 流结束
-                                if tool_calls:
-                                    yield {"tool_calls": tool_calls}
-                                yield {"done": True, "finish_reason": chunk.stop_reason}
+                    async for line in response.aiter_lines():
+                        if not line or not line.startswith("data: "):
+                            continue
+
+                        data_str = line[6:]
+                        if data_str == "[DONE]":
+                            break
+
+                        try:
+                            event = json.loads(data_str)
+                            event_type = event.get("type")
+
+                            if event_type == "content_block_delta":
+                                delta = event.get("delta", {})
+                                if delta.get("type") == "text_delta":
+                                    yield {"content": delta.get("text", "")}
+
+                            elif event_type == "message_delta":
+                                if event.get("delta", {}).get("stop_reason"):
+                                    if tool_calls:
+                                        yield {"tool_calls": tool_calls}
+                                    yield {"done": True, "finish_reason": event["delta"]["stop_reason"]}
+
+                        except json.JSONDecodeError:
+                            continue
+
                 except GeneratorExit:
-                    # 生成器被关闭，这是正常的清理过程
-                    logger.debug("Anthropic 流式响应生成器被关闭(GeneratorExit)")
+                    logger.debug("Anthropic 流式响应生成器被关闭")
                     raise
                 except Exception as iter_error:
                     logger.error(f"Anthropic 流式响应迭代出错: {str(iter_error)}")
                     raise
         except GeneratorExit:
-            # 重新抛出GeneratorExit，让调用方处理
             raise
         except Exception as e:
             logger.error(f"Anthropic 流式请求出错: {str(e)}")
