@@ -1,6 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider } from 'antd';
-import zhCN from 'antd/locale/zh_CN';
 import ProjectList from './pages/ProjectList';
 import ProjectWizardNew from './pages/ProjectWizardNew';
 import Inspiration from './pages/Inspiration';
@@ -33,7 +31,7 @@ import './App.css';
 
 function App() {
   return (
-    <ConfigProvider locale={zhCN}>
+    <>
       {/* 🧧 春节喜庆装饰 */}
       <SpringFestival />
       <BrowserRouter
@@ -74,7 +72,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </ConfigProvider>
+    </>
   );
 }
 
