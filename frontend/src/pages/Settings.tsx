@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Form, Input, Button, Select, Slider, InputNumber, message, Space, Typography, Spin, Modal, Alert, Grid, Tabs, List, Tag, Popconfirm, Empty, Row, Col } from 'antd';
+import { Card, Form, Input, Button, Select, Slider, InputNumber, message, Space, Typography, Spin, Modal, Alert, Grid, Tabs, List, Tag, Popconfirm, Empty, Row, Col, theme } from 'antd';
 import { SaveOutlined, DeleteOutlined, ReloadOutlined, InfoCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, ThunderboltOutlined, PlusOutlined, EditOutlined, CopyOutlined, WarningOutlined } from '@ant-design/icons';
 import { settingsApi, mcpPluginApi } from '../services/api';
 import type { SettingsUpdate, APIKeyPreset, PresetCreateRequest, APIKeyPresetConfig } from '../types';
@@ -11,6 +11,7 @@ const { useBreakpoint } = Grid;
 const { TextArea } = Input;
 
 export default function SettingsPage() {
+  const { token } = theme.useToken();
   const screens = useBreakpoint();
   const isMobile = !screens.md; // md断点是768px
   const [form] = Form.useForm();
@@ -50,6 +51,9 @@ export default function SettingsPage() {
   const [fetchingPresetModels, setFetchingPresetModels] = useState(false);
   const [presetModelsFetched, setPresetModelsFetched] = useState(false);
   const [presetModelSearchText, setPresetModelSearchText] = useState('');
+
+  const pageBackground = `linear-gradient(180deg, ${token.colorBgLayout} 0%, ${token.colorFillSecondary} 100%)`;
+  const headerBackground = `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryHover} 100%)`;
 
   useEffect(() => {
     loadSettings();
@@ -181,7 +185,7 @@ export default function SettingsPage() {
             modal.warning({
               title: (
                 <Space>
-                  <WarningOutlined style={{ color: '#faad14' }} />
+                  <WarningOutlined style={{ color: token.colorWarning }} />
                   <span>API 配置已更改</span>
                 </Space>
               ),
@@ -196,8 +200,8 @@ export default function SettingsPage() {
                   />
                   <div style={{
                     padding: 12,
-                    background: 'var(--color-info-bg)',
-                    border: '1px solid var(--color-info-border)',
+                    background: token.colorInfoBg,
+                    border: `1px solid ${token.colorInfoBorder}`,
                     borderRadius: 8
                   }}>
                     <Text strong style={{ display: 'block', marginBottom: 8 }}>请完成以下步骤：</Text>
@@ -600,7 +604,7 @@ export default function SettingsPage() {
               modal.warning({
                 title: (
                   <Space>
-                    <WarningOutlined style={{ color: '#faad14' }} />
+                    <WarningOutlined style={{ color: token.colorWarning }} />
                     <span>API 配置已更改</span>
                   </Space>
                 ),
@@ -615,8 +619,8 @@ export default function SettingsPage() {
                     />
                     <div style={{
                       padding: 12,
-                      background: 'var(--color-info-bg)',
-                      border: '1px solid var(--color-info-border)',
+                      background: token.colorInfoBg,
+                      border: `1px solid ${token.colorInfoBorder}`,
                       borderRadius: 8
                     }}>
                       <Text strong style={{ display: 'block', marginBottom: 8 }}>请完成以下步骤：</Text>
@@ -657,15 +661,15 @@ export default function SettingsPage() {
           width: isMobile ? '90%' : 600,
           content: (
             <div style={{ padding: '8px 0' }}>
-              <div style={{ marginBottom: 24, padding: 16, background: 'var(--color-success-bg)', border: '1px solid var(--color-success-border)', borderRadius: 8 }}>
-                <Typography.Text strong style={{ color: 'var(--color-success)' }}>
+              <div style={{ marginBottom: 24, padding: 16, background: token.colorSuccessBg, border: `1px solid ${token.colorSuccessBorder}`, borderRadius: 8 }}>
+                <Typography.Text strong style={{ color: token.colorSuccess }}>
                   ✓ API 连接正常
                 </Typography.Text>
               </div>
 
               <div style={{
                 padding: 16,
-                background: 'var(--color-bg-layout)',
+                background: token.colorBgLayout,
                 borderRadius: 8,
                 marginBottom: 16
               }}>
@@ -711,13 +715,13 @@ export default function SettingsPage() {
               {result.error && (
                 <div style={{
                   padding: 16,
-                  background: 'var(--color-error-bg)',
-                  border: '1px solid var(--color-error-border)',
+                  background: token.colorErrorBg,
+                  border: `1px solid ${token.colorErrorBorder}`,
                   borderRadius: 8,
                   marginBottom: 16
                 }}>
                   <Text strong style={{ fontSize: 14, display: 'block', marginBottom: 8 }}>错误信息:</Text>
-                  <Text style={{ fontSize: 13, color: 'var(--color-error)', fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  <Text style={{ fontSize: 13, color: token.colorError, fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {result.error}
                   </Text>
                 </div>
@@ -726,8 +730,8 @@ export default function SettingsPage() {
               {result.suggestions && result.suggestions.length > 0 && (
                 <div style={{
                   padding: 16,
-                  background: 'var(--color-warning-bg)',
-                  border: '1px solid var(--color-warning-border)',
+                  background: token.colorWarningBg,
+                  border: `1px solid ${token.colorWarningBorder}`,
                   borderRadius: 8,
                   marginBottom: 16
                 }}>
@@ -817,10 +821,10 @@ export default function SettingsPage() {
                 <List.Item
                   key={preset.id}
                   style={{
-                    background: isActive ? '#f0f5ff' : 'transparent',
+                    background: isActive ? token.colorInfoBg : 'transparent',
                     padding: '16px',
                     marginBottom: '8px',
-                    border: isActive ? '2px solid #1890ff' : '1px solid #f0f0f0',
+                    border: isActive ? `2px solid ${token.colorPrimary}` : `1px solid ${token.colorBorderSecondary}`,
                     borderRadius: '8px',
                   }}
                   actions={[
@@ -870,7 +874,7 @@ export default function SettingsPage() {
                     avatar={
                       isActive && (
                         <CheckCircleOutlined
-                          style={{ fontSize: '24px', color: '#52c41a' }}
+                          style={{ fontSize: '24px', color: token.colorSuccess }}
                         />
                       )
                     }
@@ -883,7 +887,7 @@ export default function SettingsPage() {
                     description={
                       <Space direction="vertical" size="small" style={{ width: '100%' }}>
                         {preset.description && (
-                          <div style={{ color: '#666' }}>{preset.description}</div>
+                          <div style={{ color: token.colorTextSecondary }}>{preset.description}</div>
                         )}
                         <Space wrap>
                           <Tag color={getProviderColor(preset.config.api_provider)}>
@@ -893,7 +897,7 @@ export default function SettingsPage() {
                           <Tag>温度: {preset.config.temperature}</Tag>
                           <Tag>Tokens: {preset.config.max_tokens}</Tag>
                         </Space>
-                        <div style={{ fontSize: '12px', color: '#999' }}>
+                        <div style={{ fontSize: '12px', color: token.colorTextTertiary }}>
                           创建于: {new Date(preset.created_at).toLocaleString()}
                         </div>
                       </Space>
@@ -913,7 +917,7 @@ export default function SettingsPage() {
       {contextHolder}
       <div style={{
         minHeight: '90vh',
-        background: 'linear-gradient(180deg, var(--color-bg-base) 0%, #EEF2F3 100%)',
+        background: pageBackground,
         padding: isMobile ? '20px 16px 70px' : '24px 24px 70px',
         display: 'flex',
         flexDirection: 'column',
@@ -930,9 +934,9 @@ export default function SettingsPage() {
           <Card
             variant="borderless"
             style={{
-              background: 'linear-gradient(135deg, var(--color-primary) 0%, #5A9BA5 50%, var(--color-primary-hover) 100%)',
+              background: headerBackground,
               borderRadius: isMobile ? 16 : 24,
-              boxShadow: '0 12px 40px rgba(77, 128, 136, 0.25), 0 4px 12px rgba(0, 0, 0, 0.06)',
+              boxShadow: token.boxShadowSecondary,
               marginBottom: isMobile ? 20 : 24,
               border: 'none',
               position: 'relative',
@@ -940,17 +944,17 @@ export default function SettingsPage() {
             }}
           >
             {/* 装饰性背景元素 */}
-            <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255, 255, 255, 0.08)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: -40, left: '30%', width: 120, height: 120, borderRadius: '50%', background: 'rgba(255, 255, 255, 0.05)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', top: '50%', right: '15%', width: 80, height: 80, borderRadius: '50%', background: 'rgba(255, 255, 255, 0.06)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: token.colorWhite, opacity: 0.08, pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: -40, left: '30%', width: 120, height: 120, borderRadius: '50%', background: token.colorWhite, opacity: 0.05, pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: '50%', right: '15%', width: 80, height: 80, borderRadius: '50%', background: token.colorWhite, opacity: 0.06, pointerEvents: 'none' }} />
 
             <Row align="middle" justify="space-between" gutter={[16, 16]} style={{ position: 'relative', zIndex: 1 }}>
               <Col xs={24} sm={12}>
                 <Space direction="vertical" size={4}>
-                  <Title level={isMobile ? 3 : 2} style={{ margin: 0, color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                  <Title level={isMobile ? 3 : 2} style={{ margin: 0, color: token.colorWhite, textShadow: `0 2px 4px ${token.colorBgMask}` }}>
                     AI API 设置
                   </Title>
-                  <Text style={{ fontSize: isMobile ? 12 : 14, color: 'rgba(255,255,255,0.85)', marginLeft: isMobile ? 40 : 48 }}>
+                  <Text style={{ fontSize: isMobile ? 12 : 14, color: token.colorTextLightSolid, marginLeft: isMobile ? 40 : 48, opacity: 0.85 }}>
                     配置AI接口参数，管理多个API配置预设
                   </Text>
                 </Space>
@@ -965,9 +969,9 @@ export default function SettingsPage() {
           <Card
             variant="borderless"
             style={{
-              background: 'rgba(255, 255, 255, 0.95)',
+              background: token.colorBgContainer,
               borderRadius: isMobile ? 12 : 16,
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              boxShadow: token.boxShadowSecondary,
               flex: 1,
             }}
             styles={{
@@ -1030,7 +1034,7 @@ export default function SettingsPage() {
                                 <span>API 提供商</span>
                                 <InfoCircleOutlined
                                   title="选择你的AI服务提供商"
-                                  style={{ color: 'var(--color-text-secondary)', fontSize: isMobile ? '12px' : '14px' }}
+                                  style={{ color: token.colorTextSecondary, fontSize: isMobile ? '12px' : '14px' }}
                                 />
                               </Space>
                             }
@@ -1052,7 +1056,7 @@ export default function SettingsPage() {
                                 <span>API 密钥</span>
                                 <InfoCircleOutlined
                                   title="你的API密钥，将加密存储"
-                                  style={{ color: 'var(--color-text-secondary)', fontSize: isMobile ? '12px' : '14px' }}
+                                  style={{ color: token.colorTextSecondary, fontSize: isMobile ? '12px' : '14px' }}
                                 />
                               </Space>
                             }
@@ -1072,7 +1076,7 @@ export default function SettingsPage() {
                                 <span>API 地址</span>
                                 <InfoCircleOutlined
                                   title="API的基础URL地址"
-                                  style={{ color: 'var(--color-text-secondary)', fontSize: isMobile ? '12px' : '14px' }}
+                                  style={{ color: token.colorTextSecondary, fontSize: isMobile ? '12px' : '14px' }}
                                 />
                               </Space>
                             }
@@ -1094,7 +1098,7 @@ export default function SettingsPage() {
                                 <span>模型名称</span>
                                 <InfoCircleOutlined
                                   title="AI模型的名称，如 gpt-4, gpt-3.5-turbo"
-                                  style={{ color: 'var(--color-text-secondary)', fontSize: isMobile ? '12px' : '14px' }}
+                                  style={{ color: token.colorTextSecondary, fontSize: isMobile ? '12px' : '14px' }}
                                 />
                               </Space>
                             }
@@ -1121,17 +1125,17 @@ export default function SettingsPage() {
                                 <>
                                   {menu}
                                   {fetchingModels && (
-                                    <div style={{ padding: '8px 12px', color: 'var(--color-text-secondary)', textAlign: 'center', fontSize: isMobile ? '12px' : '14px' }}>
+                                    <div style={{ padding: '8px 12px', color: token.colorTextSecondary, textAlign: 'center', fontSize: isMobile ? '12px' : '14px' }}>
                                       <Spin size="small" /> 正在获取模型列表...
                                     </div>
                                   )}
                                   {!fetchingModels && modelOptions.length === 0 && modelsFetched && !modelSearchText && (
-                                    <div style={{ padding: '8px 12px', color: '#ff4d4f', textAlign: 'center', fontSize: isMobile ? '12px' : '14px' }}>
+                                    <div style={{ padding: '8px 12px', color: token.colorError, textAlign: 'center', fontSize: isMobile ? '12px' : '14px' }}>
                                       未能获取到模型列表，可直接输入模型名称
                                     </div>
                                   )}
                                   {!fetchingModels && modelOptions.length === 0 && !modelsFetched && !modelSearchText && (
-                                    <div style={{ padding: '8px 12px', color: 'var(--color-text-secondary)', textAlign: 'center', fontSize: isMobile ? '12px' : '14px' }}>
+                                    <div style={{ padding: '8px 12px', color: token.colorTextSecondary, textAlign: 'center', fontSize: isMobile ? '12px' : '14px' }}>
                                       点击输入框自动获取，或直接输入模型名称
                                     </div>
                                   )}
@@ -1200,13 +1204,13 @@ export default function SettingsPage() {
                                   <div style={{ fontWeight: 500, fontSize: isMobile ? '13px' : '14px' }}>
                                     {option.data.description === '手动输入的模型名称' ? (
                                       <Space size={4}>
-                                        <EditOutlined style={{ color: 'var(--color-primary)' }} />
+                                        <EditOutlined style={{ color: token.colorPrimary }} />
                                         <span>使用 "{option.data.label}"</span>
                                       </Space>
                                     ) : option.data.label}
                                   </div>
                                   {option.data.description && option.data.description !== '手动输入的模型名称' && (
-                                    <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#8c8c8c', marginTop: '2px' }}>
+                                    <div style={{ fontSize: isMobile ? '11px' : '12px', color: token.colorTextTertiary, marginTop: '2px' }}>
                                       {option.data.description}
                                     </div>
                                   )}
@@ -1221,7 +1225,7 @@ export default function SettingsPage() {
                                 <span>温度参数</span>
                                 <InfoCircleOutlined
                                   title="控制输出的随机性，值越高越随机（0.0-2.0）"
-                                  style={{ color: 'var(--color-text-secondary)', fontSize: isMobile ? '12px' : '14px' }}
+                                  style={{ color: token.colorTextSecondary, fontSize: isMobile ? '12px' : '14px' }}
                                 />
                               </Space>
                             }
@@ -1246,7 +1250,7 @@ export default function SettingsPage() {
                                 <span>最大 Token 数</span>
                                 <InfoCircleOutlined
                                   title="单次请求的最大token数量"
-                                  style={{ color: 'var(--color-text-secondary)', fontSize: isMobile ? '12px' : '14px' }}
+                                  style={{ color: token.colorTextSecondary, fontSize: isMobile ? '12px' : '14px' }}
                                 />
                               </Space>
                             }
@@ -1270,7 +1274,7 @@ export default function SettingsPage() {
                                 <span>系统提示词</span>
                                 <InfoCircleOutlined
                                   title="设置全局系统提示词，每次AI调用时都会自动使用。可用于设定AI的角色、语言风格等"
-                                  style={{ color: 'var(--color-text-secondary)', fontSize: isMobile ? '12px' : '14px' }}
+                                  style={{ color: token.colorTextSecondary, fontSize: isMobile ? '12px' : '14px' }}
                                 />
                               </Space>
                             }
@@ -1291,9 +1295,9 @@ export default function SettingsPage() {
                               message={
                                 <Space>
                                   {testResult.success ? (
-                                    <CheckCircleOutlined style={{ color: 'var(--color-success)', fontSize: isMobile ? '16px' : '18px' }} />
+                                    <CheckCircleOutlined style={{ color: token.colorSuccess, fontSize: isMobile ? '16px' : '18px' }} />
                                   ) : (
-                                    <CloseCircleOutlined style={{ color: 'var(--color-error)', fontSize: isMobile ? '16px' : '18px' }} />
+                                    <CloseCircleOutlined style={{ color: token.colorError, fontSize: isMobile ? '16px' : '18px' }} />
                                   )}
                                   <span style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: 500 }}>
                                     {testResult.message}
@@ -1313,16 +1317,16 @@ export default function SettingsPage() {
                                         <div style={{
                                           fontSize: isMobile ? '12px' : '13px',
                                           padding: '8px 12px',
-                                          background: '#f6ffed',
+                                          background: token.colorSuccessBg,
                                           borderRadius: '4px',
-                                          border: '1px solid #b7eb8f',
+                                          border: `1px solid ${token.colorSuccessBorder}`,
                                           marginTop: '8px'
                                         }}>
                                           <div style={{ marginBottom: '4px', fontWeight: 500 }}>AI 响应预览:</div>
-                                          <div style={{ color: '#595959' }}>{testResult.response_preview}</div>
+                                          <div style={{ color: token.colorTextSecondary }}>{testResult.response_preview}</div>
                                         </div>
                                       )}
-                                      <div style={{ color: 'var(--color-success)', fontSize: isMobile ? '12px' : '13px', marginTop: '4px' }}>
+                                      <div style={{ color: token.colorSuccess, fontSize: isMobile ? '12px' : '13px', marginTop: '4px' }}>
                                         ✓ API 配置正确，可以正常使用
                                       </div>
                                     </Space>
@@ -1332,16 +1336,16 @@ export default function SettingsPage() {
                                         <div style={{
                                           fontSize: isMobile ? '12px' : '13px',
                                           padding: '8px 12px',
-                                          background: '#fff2e8',
+                                          background: token.colorErrorBg,
                                           borderRadius: '4px',
-                                          border: '1px solid #ffbb96',
-                                          color: '#d4380d'
+                                          border: `1px solid ${token.colorErrorBorder}`,
+                                          color: token.colorError
                                         }}>
                                           <strong>错误信息:</strong> {testResult.error}
                                         </div>
                                       )}
                                       {testResult.error_type && (
-                                        <div style={{ fontSize: isMobile ? '11px' : '12px', color: 'var(--color-text-secondary)' }}>
+                                        <div style={{ fontSize: isMobile ? '11px' : '12px', color: token.colorTextSecondary }}>
                                           错误类型: {testResult.error_type}
                                         </div>
                                       )}
@@ -1354,7 +1358,7 @@ export default function SettingsPage() {
                                             margin: 0,
                                             paddingLeft: isMobile ? '16px' : '20px',
                                             fontSize: isMobile ? '12px' : '13px',
-                                            color: '#595959'
+                                            color: token.colorTextSecondary
                                           }}>
                                             {testResult.suggestions.map((suggestion, index) => (
                                               <li key={index} style={{ marginBottom: '4px' }}>{suggestion}</li>
@@ -1386,7 +1390,7 @@ export default function SettingsPage() {
                                   loading={loading}
                                   block
                                   style={{
-                                    background: 'var(--color-primary)',
+                                    background: token.colorPrimary,
                                     border: 'none',
                                     height: '44px'
                                   }}
@@ -1400,8 +1404,8 @@ export default function SettingsPage() {
                                   loading={testingApi}
                                   block
                                   style={{
-                                    borderColor: 'var(--color-success)',
-                                    color: 'var(--color-success)',
+                                    borderColor: token.colorSuccess,
+                                    color: token.colorSuccess,
                                     fontWeight: 500,
                                     height: '44px'
                                   }}
@@ -1466,8 +1470,8 @@ export default function SettingsPage() {
                                     onClick={handleTestConnection}
                                     loading={testingApi}
                                     style={{
-                                      borderColor: 'var(--color-success)',
-                                      color: 'var(--color-success)',
+                                      borderColor: token.colorSuccess,
+                                      color: token.colorSuccess,
                                       fontWeight: 500,
                                       minWidth: '100px'
                                     }}
@@ -1491,7 +1495,7 @@ export default function SettingsPage() {
                                     htmlType="submit"
                                     loading={loading}
                                     style={{
-                                      background: 'var(--color-primary)',
+                                      background: token.colorPrimary,
                                       border: 'none',
                                       minWidth: '120px',
                                       fontWeight: 500
@@ -1611,7 +1615,7 @@ export default function SettingsPage() {
                       <span>模型名称</span>
                       <InfoCircleOutlined
                         title="AI模型的名称，点击下拉框自动获取可用模型"
-                        style={{ color: 'var(--color-text-secondary)', fontSize: '12px' }}
+                        style={{ color: token.colorTextSecondary, fontSize: '12px' }}
                       />
                     </Space>
                   }
@@ -1637,17 +1641,17 @@ export default function SettingsPage() {
                       <>
                         {menu}
                         {fetchingPresetModels && (
-                          <div style={{ padding: '8px 12px', color: 'var(--color-text-secondary)', textAlign: 'center', fontSize: '12px' }}>
+                          <div style={{ padding: '8px 12px', color: token.colorTextSecondary, textAlign: 'center', fontSize: '12px' }}>
                             <Spin size="small" /> 正在获取模型列表...
                           </div>
                         )}
                         {!fetchingPresetModels && presetModelOptions.length === 0 && presetModelsFetched && !presetModelSearchText && (
-                          <div style={{ padding: '8px 12px', color: '#ff4d4f', textAlign: 'center', fontSize: '12px' }}>
+                          <div style={{ padding: '8px 12px', color: token.colorError, textAlign: 'center', fontSize: '12px' }}>
                             未能获取到模型列表，可直接输入模型名称
                           </div>
                         )}
                         {!fetchingPresetModels && presetModelOptions.length === 0 && !presetModelsFetched && !presetModelSearchText && (
-                          <div style={{ padding: '8px 12px', color: 'var(--color-text-secondary)', textAlign: 'center', fontSize: '12px' }}>
+                          <div style={{ padding: '8px 12px', color: token.colorTextSecondary, textAlign: 'center', fontSize: '12px' }}>
                             点击输入框自动获取，或直接输入模型名称
                           </div>
                         )}
@@ -1714,13 +1718,13 @@ export default function SettingsPage() {
                         <div style={{ fontWeight: 500, fontSize: '13px' }}>
                           {option.data.description === '手动输入的模型名称' ? (
                             <Space size={4}>
-                              <EditOutlined style={{ color: 'var(--color-primary)' }} />
+                              <EditOutlined style={{ color: token.colorPrimary }} />
                               <span>使用 "{option.data.label}"</span>
                             </Space>
                           ) : option.data.label}
                         </div>
                         {option.data.description && option.data.description !== '手动输入的模型名称' && (
-                          <div style={{ fontSize: '11px', color: '#8c8c8c', marginTop: '2px' }}>
+                          <div style={{ fontSize: '11px', color: token.colorTextTertiary, marginTop: '2px' }}>
                             {option.data.description}
                           </div>
                         )}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { List, Button, Modal, Form, Input, Select, message, Empty, Space, Badge, Tag, Card, InputNumber, Alert, Radio, Descriptions, Collapse, Popconfirm, Pagination } from 'antd';
+import { List, Button, Modal, Form, Input, Select, message, Empty, Space, Badge, Tag, Card, InputNumber, Alert, Radio, Descriptions, Collapse, Popconfirm, Pagination, theme } from 'antd';
 import { EditOutlined, FileTextOutlined, ThunderboltOutlined, LockOutlined, DownloadOutlined, SettingOutlined, FundOutlined, SyncOutlined, CheckCircleOutlined, CloseCircleOutlined, RocketOutlined, StopOutlined, InfoCircleOutlined, CaretRightOutlined, DeleteOutlined, BookOutlined, FormOutlined, PlusOutlined, ReadOutlined } from '@ant-design/icons';
 import { useStore } from '../store';
 import { useChapterSync } from '../store/hooks';
@@ -48,6 +48,7 @@ const setCachedWordCount = (value: number): void => {
 export default function Chapters() {
   const { currentProject, chapters, outlines, setCurrentChapter, setCurrentProject } = useStore();
   const [modal, contextHolder] = Modal.useModal();
+  const { token } = theme.useToken();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isContinuing, setIsContinuing] = useState(false);
@@ -900,11 +901,11 @@ export default function Chapters() {
             <div style={{
               marginTop: 16,
               padding: 12,
-              background: 'var(--color-info-bg)',
-              borderRadius: 4,
-              border: '1px solid var(--color-info-border)'
+              background: token.colorInfoBg,
+              borderRadius: token.borderRadius,
+              border: `1px solid ${token.colorInfoBorder}`
             }}>
-              <div style={{ marginBottom: 8, fontWeight: 500, color: 'var(--color-primary)' }}>
+              <div style={{ marginBottom: 8, fontWeight: 500, color: token.colorPrimary }}>
                 📚 将引用的前置章节（共{previousChapters.length}章）：
               </div>
               <div style={{ maxHeight: 150, overflowY: 'auto' }}>
@@ -914,13 +915,13 @@ export default function Chapters() {
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
+              <div style={{ marginTop: 8, fontSize: 12, color: token.colorTextSecondary }}>
                 💡 AI会参考这些章节内容，确保情节连贯、角色状态一致
               </div>
             </div>
           )}
 
-          <p style={{ color: '#ff4d4f', marginTop: 16, marginBottom: 0 }}>
+          <p style={{ color: token.colorError, marginTop: 16, marginBottom: 0 }}>
             ⚠️ 注意：此操作将覆盖当前章节内容
           </p>
         </div>
@@ -1406,7 +1407,7 @@ export default function Chapters() {
           // 显示冲突提示Modal
           modal.confirm({
             title: '章节序号冲突',
-            icon: <InfoCircleOutlined style={{ color: '#ff4d4f' }} />,
+            icon: <InfoCircleOutlined style={{ color: token.colorError }} />,
             width: 500,
             centered: true,
             content: (
@@ -1416,9 +1417,9 @@ export default function Chapters() {
                 </p>
                 <div style={{
                   padding: 12,
-                  background: '#fff7e6',
-                  borderRadius: 4,
-                  border: '1px solid #ffd591',
+                  background: token.colorWarningBg,
+                  borderRadius: token.borderRadius,
+                  border: `1px solid ${token.colorWarningBorder}`,
                   marginBottom: 12
                 }}>
                   <div><strong>标题：</strong>{conflictChapter.title}</div>
@@ -1428,10 +1429,10 @@ export default function Chapters() {
                     <div><strong>所属大纲：</strong>{conflictChapter.outline_title}</div>
                   )}
                 </div>
-                <p style={{ color: '#ff4d4f', marginBottom: 8 }}>
+                <p style={{ color: token.colorError, marginBottom: 8 }}>
                   ⚠️ 是否删除旧章节并创建新章节？
                 </p>
-                <p style={{ fontSize: 12, color: '#666', marginBottom: 0 }}>
+                <p style={{ fontSize: 12, color: token.colorTextSecondary, marginBottom: 0 }}>
                   删除后将无法恢复，章节内容和分析结果都将被删除。
                 </p>
               </div>
@@ -1551,7 +1552,7 @@ export default function Chapters() {
       modal.info({
         title: (
           <Space style={{ flexWrap: 'wrap' }}>
-            <InfoCircleOutlined style={{ color: 'var(--color-primary)' }} />
+            <InfoCircleOutlined style={{ color: token.colorPrimary }} />
             <span style={{ wordBreak: 'break-word' }}>第{chapter.chapter_number}章展开规划</span>
           </Space>
         ),
@@ -1684,7 +1685,7 @@ export default function Chapters() {
                         key={idx}
                         size="small"
                         style={{
-                          backgroundColor: '#fafafa',
+                          backgroundColor: token.colorFillQuaternary,
                           maxWidth: '100%',
                           overflow: 'hidden'
                         }}
@@ -1875,10 +1876,10 @@ export default function Chapters() {
         position: 'sticky',
         top: 0,
         zIndex: 10,
-        backgroundColor: 'var(--color-bg-container)',
+        backgroundColor: token.colorBgContainer,
         padding: isMobile ? '12px 0' : '16px 0',
         marginBottom: isMobile ? 12 : 16,
-        borderBottom: '1px solid #f0f0f0',
+        borderBottom: `1px solid ${token.colorBorderSecondary}`,
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         gap: isMobile ? 12 : 0,
@@ -1925,7 +1926,7 @@ export default function Chapters() {
             disabled={chapters.length === 0 || batchAnalyzableChapterCount === 0}
             block={isMobile}
             size={isMobile ? 'middle' : 'middle'}
-            style={{ background: '#fa8c16', borderColor: '#fa8c16' }}
+            style={{ background: token.colorWarning, borderColor: token.colorWarning }}
             title={batchAnalyzableChapterCount === 0 ? '暂无可一键分析章节' : `可一键分析 ${batchAnalyzableChapterCount} 章`}
           >
             一键分析{batchAnalyzableChapterCount > 0 ? ` (${batchAnalyzableChapterCount})` : ''}
@@ -1937,7 +1938,7 @@ export default function Chapters() {
             disabled={chapters.length === 0}
             block={isMobile}
             size={isMobile ? 'middle' : 'middle'}
-            style={{ background: '#722ed1', borderColor: '#722ed1' }}
+            style={{ background: token.colorInfo, borderColor: token.colorInfo }}
           >
             批量生成
           </Button>
@@ -1969,9 +1970,9 @@ export default function Chapters() {
                 style={{
                   padding: '16px',
                   marginBottom: 16,
-                  background: '#fff',
-                  borderRadius: 8,
-                  border: '1px solid #f0f0f0',
+                  background: token.colorBgContainer,
+                  borderRadius: token.borderRadius,
+                  border: `1px solid ${token.colorBorderSecondary}`,
                   flexDirection: isMobile ? 'column' : 'row',
                   alignItems: isMobile ? 'flex-start' : 'center',
                 }}
@@ -2025,7 +2026,7 @@ export default function Chapters() {
               >
                 <div style={{ width: '100%' }}>
                   <List.Item.Meta
-                    avatar={!isMobile && <FileTextOutlined style={{ fontSize: 32, color: 'var(--color-primary)' }} />}
+                    avatar={!isMobile && <FileTextOutlined style={{ fontSize: 32, color: token.colorPrimary }} />}
                     title={
                       <div style={{
                         display: 'flex',
@@ -2039,7 +2040,7 @@ export default function Chapters() {
                         </span>
                         <Space wrap size={isMobile ? 4 : 8}>
                           <Tag color={getStatusColor(item.status)}>{getStatusText(item.status)}</Tag>
-                          <Badge count={`${item.word_count || 0}字`} style={{ backgroundColor: 'var(--color-success)' }} />
+                          <Badge count={`${item.word_count || 0}字`} style={{ backgroundColor: token.colorSuccess }} />
                           {renderAnalysisStatus(item.id)}
                           {!canGenerateChapter(item) && (
                             <Tag icon={<LockOutlined />} color="warning" title={getGenerateDisabledReason(item)}>
@@ -2051,12 +2052,12 @@ export default function Chapters() {
                     }
                     description={
                       item.content ? (
-                        <div style={{ marginTop: 8, color: 'rgba(0,0,0,0.65)', lineHeight: 1.6, fontSize: isMobile ? 12 : 14 }}>
+                        <div style={{ marginTop: 8, color: token.colorTextSecondary, lineHeight: 1.6, fontSize: isMobile ? 12 : 14 }}>
                           {item.content.substring(0, isMobile ? 80 : 150)}
                           {item.content.length > (isMobile ? 80 : 150) && '...'}
                         </div>
                       ) : (
-                        <span style={{ color: 'rgba(0,0,0,0.45)', fontSize: isMobile ? 12 : 14 }}>暂无内容</span>
+                        <span style={{ color: token.colorTextTertiary, fontSize: isMobile ? 12 : 14 }}>暂无内容</span>
                       )
                     }
                   />
@@ -2134,19 +2135,19 @@ export default function Chapters() {
                     </span>
                     <Badge
                       count={`${group.chapters.length} 章`}
-                      style={{ backgroundColor: 'var(--color-success)' }}
+                      style={{ backgroundColor: token.colorSuccess }}
                     />
                     <Badge
                       count={`${group.chapters.reduce((sum, ch) => sum + (ch.word_count || 0), 0)} 字`}
-                      style={{ backgroundColor: 'var(--color-primary)' }}
+                      style={{ backgroundColor: token.colorPrimary }}
                     />
                   </div>
                 }
                 style={{
                   marginBottom: 16,
-                  background: '#fff',
-                  borderRadius: 8,
-                  border: '1px solid #f0f0f0',
+                  background: token.colorBgContainer,
+                  borderRadius: token.borderRadius,
+                  border: `1px solid ${token.colorBorderSecondary}`,
                 }}
               >
                 <List
@@ -2230,7 +2231,7 @@ export default function Chapters() {
                     >
                       <div style={{ width: '100%' }}>
                         <List.Item.Meta
-                          avatar={!isMobile && <FileTextOutlined style={{ fontSize: 32, color: 'var(--color-primary)' }} />}
+                          avatar={!isMobile && <FileTextOutlined style={{ fontSize: 32, color: token.colorPrimary }} />}
                           title={
                             <div style={{
                               display: 'flex',
@@ -2244,7 +2245,7 @@ export default function Chapters() {
                               </span>
                               <Space wrap size={isMobile ? 4 : 8}>
                                 <Tag color={getStatusColor(item.status)}>{getStatusText(item.status)}</Tag>
-                                <Badge count={`${item.word_count || 0}字`} style={{ backgroundColor: 'var(--color-success)' }} />
+                                <Badge count={`${item.word_count || 0}字`} style={{ backgroundColor: token.colorSuccess }} />
                                 {renderAnalysisStatus(item.id)}
                                 {!canGenerateChapter(item) && (
                                   <Tag icon={<LockOutlined />} color="warning" title={getGenerateDisabledReason(item)}>
@@ -2255,7 +2256,7 @@ export default function Chapters() {
                                   {item.expansion_plan && (
                                     <InfoCircleOutlined
                                       title="查看展开详情"
-                                      style={{ color: 'var(--color-primary)', cursor: 'pointer', fontSize: 16 }}
+                                      style={{ color: token.colorPrimary, cursor: 'pointer', fontSize: 16 }}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         showExpansionPlanModal(item);
@@ -2264,7 +2265,7 @@ export default function Chapters() {
                                   )}
                                   <FormOutlined
                                     title={item.expansion_plan ? "编辑规划信息" : "创建规划信息"}
-                                    style={{ color: 'var(--color-success)', cursor: 'pointer', fontSize: 16 }}
+                                    style={{ color: token.colorSuccess, cursor: 'pointer', fontSize: 16 }}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleOpenPlanEditor(item);
@@ -2276,12 +2277,12 @@ export default function Chapters() {
                           }
                           description={
                             item.content ? (
-                              <div style={{ marginTop: 8, color: 'rgba(0,0,0,0.65)', lineHeight: 1.6, fontSize: isMobile ? 12 : 14 }}>
+                              <div style={{ marginTop: 8, color: token.colorTextSecondary, lineHeight: 1.6, fontSize: isMobile ? 12 : 14 }}>
                                 {item.content.substring(0, isMobile ? 80 : 150)}
                                 {item.content.length > (isMobile ? 80 : 150) && '...'}
                               </div>
                             ) : (
-                              <span style={{ color: 'rgba(0,0,0,0.45)', fontSize: isMobile ? 12 : 14 }}>暂无内容</span>
+                              <span style={{ color: token.colorTextTertiary, fontSize: isMobile ? 12 : 14 }}>暂无内容</span>
                             )
                           }
                         />
@@ -2539,7 +2540,7 @@ export default function Chapters() {
                 ))}
               </Select>
               {!selectedStyleId && (
-                <div style={{ color: '#ff4d4f', fontSize: 12, marginTop: 4 }}>请选择写作风格</div>
+                <div style={{ color: token.colorError, fontSize: 12, marginTop: 4 }}>请选择写作风格</div>
               )}
             </Form.Item>
 
@@ -2560,7 +2561,7 @@ export default function Chapters() {
                 <Select.Option value="全知视角">全知视角</Select.Option>
               </Select>
               {temporaryNarrativePerspective && (
-                <div style={{ color: 'var(--color-success)', fontSize: 12, marginTop: 4 }}>
+                <div style={{ color: token.colorSuccess, fontSize: 12, marginTop: 4 }}>
                   ✓ {getNarrativePerspectiveText(temporaryNarrativePerspective)}
                 </div>
               )}
@@ -2703,7 +2704,7 @@ export default function Chapters() {
       <Modal
         title={
           <Space>
-            <RocketOutlined style={{ color: '#722ed1' }} />
+            <RocketOutlined style={{ color: token.colorInfo }} />
             <span>批量生成章节内容</span>
           </Space>
         }
@@ -2879,7 +2880,7 @@ export default function Chapters() {
               >
                 <Radio.Group disabled>
                   <Radio value={true}>
-                    <span style={{ fontSize: 12, color: '#52c41a' }}>✓ 自动更新角色状态</span>
+                    <span style={{ fontSize: 12, color: token.colorSuccess }}>✓ 自动更新角色状态</span>
                   </Radio>
                 </Radio.Group>
               </Form.Item>

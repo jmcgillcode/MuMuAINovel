@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Typography, Space, Divider, Badge, Button, Grid } from 'antd';
+import { Typography, Space, Divider, Badge, Button, Grid, theme } from 'antd';
 import { GithubOutlined, CopyrightOutlined, HeartFilled, ClockCircleOutlined, GiftOutlined } from '@ant-design/icons';
 import { VERSION_INFO, getVersionString } from '../config/version';
 import { checkLatestVersion } from '../services/versionService';
@@ -17,6 +17,8 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
   const [hasUpdate, setHasUpdate] = useState(false);
   const [latestVersion, setLatestVersion] = useState('');
   const [releaseUrl, setReleaseUrl] = useState('');
+  const { token } = theme.useToken();
+  const alphaColor = (color: string, alpha: number) => `color-mix(in srgb, ${color} ${(alpha * 100).toFixed(0)}%, transparent)`;
 
   useEffect(() => {
     // 检查版本更新（每次都重新检查）
@@ -55,11 +57,11 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
         right: 0,
         backdropFilter: 'blur(20px) saturate(180%)',
         WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderTop: '1px solid var(--color-border)',
+        borderTop: `1px solid ${token.colorBorder}`,
         padding: isMobile ? '8px 12px' : '10px 16px',
         zIndex: 100,
-        boxShadow: 'var(--shadow-card)',
-        backgroundColor: 'rgba(255, 255, 255, 0.8)', // 半透明背景以支持 backdrop-filter
+        boxShadow: `0 -2px 16px ${alphaColor(token.colorText, 0.08)}`,
+        backgroundColor: alphaColor(token.colorBgContainer, 0.82), // 半透明背景以支持 backdrop-filter
         transition: 'left 0.3s ease', // 平滑过渡
       }}
     >
@@ -87,23 +89,23 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 4,
-                  color: 'var(--color-primary)',
+                  color: token.colorPrimary,
                   cursor: hasUpdate ? 'pointer' : 'default',
                 }}
                 title={hasUpdate ? `发现新版本 v${latestVersion}，点击查看` : '当前版本'}
               >
-                <strong style={{ color: 'var(--color-text-primary)' }}>{VERSION_INFO.projectName}</strong>
+                <strong style={{ color: token.colorText }}>{VERSION_INFO.projectName}</strong>
                 <span>{getVersionString()}</span>
               </Text>
             </Badge>
-            <Divider type="vertical" style={{ margin: '0 4px', borderColor: 'var(--color-border)' }} />
+            <Divider type="vertical" style={{ margin: '0 4px', borderColor: token.colorBorder }} />
             <Button
               type="text"
               size="small"
               icon={<GiftOutlined />}
               onClick={() => window.open('https://mumuverse.space:1588/', '_blank')}
               style={{
-                color: 'var(--color-text-secondary)',
+                color: token.colorTextSecondary,
                 fontSize: 11,
                 height: 24,
                 padding: '0 4px',
@@ -114,7 +116,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
             >
               赞助
             </Button>
-            <Divider type="vertical" style={{ margin: '0 4px', borderColor: 'var(--color-border)' }} />
+            <Divider type="vertical" style={{ margin: '0 4px', borderColor: token.colorBorder }} />
             <Link
               href={VERSION_INFO.githubUrl}
               target="_blank"
@@ -124,7 +126,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-                color: 'var(--color-text-secondary)',
+                color: token.colorTextSecondary,
               }}
             >
               <GithubOutlined style={{ fontSize: 12 }} />
@@ -132,7 +134,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
             <Text
               style={{
                 fontSize: 10,
-                color: 'var(--color-text-tertiary)',
+                color: token.colorTextTertiary,
               }}
             >
               <ClockCircleOutlined style={{ fontSize: 10, marginRight: 4 }} />
@@ -144,7 +146,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
           <Space
             direction="horizontal"
             size={12}
-            split={<Divider type="vertical" style={{ borderColor: 'var(--color-border)' }} />}
+            split={<Divider type="vertical" style={{ borderColor: token.colorBorder }} />}
             style={{
               display: 'flex',
               justifyContent: 'center',
@@ -160,7 +162,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 6,
-                  color: 'var(--color-text-secondary)',
+                  color: token.colorTextSecondary,
                   textShadow: 'none',
                   cursor: hasUpdate ? 'pointer' : 'default',
                   transition: 'all 0.3s',
@@ -177,7 +179,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
                 }}
                 title={hasUpdate ? `发现新版本 v${latestVersion}，点击查看` : '当前版本'}
               >
-                <strong style={{ color: 'var(--color-text-primary)' }}>{VERSION_INFO.projectName}</strong>
+                <strong style={{ color: token.colorText }}>{VERSION_INFO.projectName}</strong>
                 <span>{getVersionString()}</span>
               </Text>
             </Badge>
@@ -192,7 +194,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                color: 'var(--color-text-secondary)',
+                color: token.colorTextSecondary,
               }}
             >
               <GithubOutlined style={{ fontSize: 13 }} />
@@ -206,7 +208,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
               rel="noopener noreferrer"
               style={{
                 fontSize: 12,
-                color: 'var(--color-text-secondary)',
+                color: token.colorTextSecondary,
               }}
             >
               LinuxDO 社区
@@ -218,9 +220,9 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
               icon={<GiftOutlined style={{ fontSize: 14 }} />}
               onClick={() => window.open('https://mumuverse.space:1588/', '_blank')}
               style={{
-                background: 'var(--color-primary)',
+                background: token.colorPrimary,
                 border: 'none',
-                boxShadow: '0 4px 12px rgba(77, 128, 136, 0.3)',
+                boxShadow: `0 4px 12px ${alphaColor(token.colorPrimary, 0.35)}`,
                 fontSize: 13,
                 height: 32,
                 padding: '0 20px',
@@ -232,11 +234,11 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.6)';
+                e.currentTarget.style.boxShadow = `0 6px 16px ${alphaColor(token.colorPrimary, 0.5)}`;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.5)';
+                e.currentTarget.style.boxShadow = `0 4px 12px ${alphaColor(token.colorPrimary, 0.35)}`;
               }}
             >
               赞助支持
@@ -252,7 +254,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                color: 'var(--color-text-secondary)',
+                color: token.colorTextSecondary,
               }}
             >
               <CopyrightOutlined style={{ fontSize: 11 }} />
@@ -266,7 +268,7 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-                color: 'var(--color-text-tertiary)',
+                color: token.colorTextTertiary,
               }}
             >
               <ClockCircleOutlined style={{ fontSize: 12 }} />
@@ -280,12 +282,12 @@ export default function AppFooter({ sidebarWidth = 0 }: AppFooterProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-                color: 'var(--color-text-secondary)',
-                textShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                color: token.colorTextSecondary,
+                textShadow: `0 1px 3px ${alphaColor(token.colorText, 0.08)}`,
               }}
             >
               <span>Made with</span>
-              <HeartFilled style={{ color: 'var(--color-error)', fontSize: 11 }} />
+              <HeartFilled style={{ color: token.colorError, fontSize: 11 }} />
               <span>by {VERSION_INFO.author}</span>
             </Text>
           </Space>
